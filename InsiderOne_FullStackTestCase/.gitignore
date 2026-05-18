@@ -1,0 +1,19 @@
+# Environment variables — never commit this
+.env
+
+# Go build output
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/football-api
+
+# Go dependency cache
+vendor/
+
+# IDE
+.vscode/
+.idea/
