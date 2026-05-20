@@ -1,0 +1,2 @@
+-- 002_seed_data.sql
+-- TODO: INSERT 4 teams and 12 scheduled matches (6 weeks)
