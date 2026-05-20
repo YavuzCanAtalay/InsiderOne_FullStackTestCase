@@ -1,0 +1,2 @@
+-- 001_create_tables.sql
+-- TODO: CREATE TABLE teams, matches, predictions
