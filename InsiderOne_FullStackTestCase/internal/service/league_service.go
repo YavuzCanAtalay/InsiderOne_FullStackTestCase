@@ -6,7 +6,7 @@ import (
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/simulator"
 )
 
-type LeagueService struct {
+type LeagueService struct { // playing next week, whole season, getting standings
 	teamRepo  repository.TeamRepository
 	matchRepo repository.MatchRepository
 	simulator simulator.MatchSimulator
@@ -34,7 +34,7 @@ func (s *LeagueService) PlayNextWeek() ([]domain.Match, []domain.Standing, error
 		return nil, nil, nil
 	}
 
-	nextWeek := unplayed[0].Week
+	nextWeek := unplayed[0].Week // first unplayed match's week number
 	var weekMatches []domain.Match
 	for _, m := range unplayed {
 		if m.Week == nextWeek {
@@ -52,15 +52,15 @@ func (s *LeagueService) PlayNextWeek() ([]domain.Match, []domain.Standing, error
 		teamMap[t.ID] = t
 	}
 
-	for _, m := range weekMatches {
-		result := s.simulator.Simulate(teamMap[m.HomeTeamID], teamMap[m.AwayTeamID])
-		if err := s.matchRepo.UpdateResult(m.ID, result); err != nil {
+	for i := range weekMatches {
+		result := s.simulator.Simulate(teamMap[weekMatches[i].HomeTeamID], teamMap[weekMatches[i].AwayTeamID])
+		if err := s.matchRepo.UpdateResult(weekMatches[i].ID, result); err != nil {
 			return nil, nil, err
 		}
 		hg, ag := result.HomeGoals, result.AwayGoals
-		m.HomeGoals = &hg
-		m.AwayGoals = &ag
-		m.IsPlayed = true
+		weekMatches[i].HomeGoals = &hg
+		weekMatches[i].AwayGoals = &ag
+		weekMatches[i].IsPlayed = true
 	}
 
 	allMatches, err := s.matchRepo.GetAll()

@@ -3,15 +3,17 @@ package handler
 import (
 	"net/http"
 
+	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/prediction"
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/service"
 )
 
 type WeekHandler struct {
-	leagueService *service.LeagueService
+	leagueService  *service.LeagueService
+	predictionEngine prediction.PredictionEngine
 }
 
-func NewWeekHandler(leagueService *service.LeagueService) *WeekHandler {
-	return &WeekHandler{leagueService: leagueService}
+func NewWeekHandler(leagueService *service.LeagueService, predEngine prediction.PredictionEngine) *WeekHandler {
+	return &WeekHandler{leagueService: leagueService, predictionEngine: predEngine}
 }
 
 func (h *WeekHandler) PlayNextWeek(w http.ResponseWriter, r *http.Request) {
@@ -30,9 +32,19 @@ func (h *WeekHandler) PlayNextWeek(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{
-		"week":      matches[0].Week,
+	week := matches[0].Week
+	resp := map[string]any{
+		"week":      week,
 		"matches":   matches,
 		"standings": standings,
-	})
+	}
+
+	if week >= 4 {
+		predictions, err := h.predictionEngine.Predict(week)
+		if err == nil {
+			resp["predictions"] = predictions
+		}
+	}
+
+	writeJSON(w, http.StatusOK, resp)
 }

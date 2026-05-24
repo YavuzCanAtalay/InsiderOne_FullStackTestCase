@@ -3,6 +3,6 @@ package domain
 type Prediction struct {
 	TeamID                  int
 	TeamName                string
-	ChampionshipProbability float64
+	ChampionshipProbability string
 	ExpectedFinalPosition   float64
 }

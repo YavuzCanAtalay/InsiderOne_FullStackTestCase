@@ -6,7 +6,7 @@ import (
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/repository"
 )
 
-type TeamHandler struct {
+type TeamHandler struct { // stores a team repository used to fetch team data from db
 	teamRepo repository.TeamRepository
 }
 

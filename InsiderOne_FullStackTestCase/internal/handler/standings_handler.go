@@ -6,7 +6,7 @@ import (
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/service"
 )
 
-type StandingsHandler struct {
+type StandingsHandler struct { // stores a league service used to fetch standings data from db
 	leagueService *service.LeagueService
 }
 
@@ -21,4 +21,4 @@ func (h *StandingsHandler) GetStandings(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	writeJSON(w, http.StatusOK, standings)
-}
+} // fetches current league standings from league service and returns as JSON response

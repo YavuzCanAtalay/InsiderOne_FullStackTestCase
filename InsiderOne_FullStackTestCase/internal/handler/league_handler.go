@@ -26,6 +26,11 @@ func (h *LeagueHandler) PlayAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(results) == 0 {
+		writeJSON(w, http.StatusOK, map[string]string{"message": "all matches are already played"})
+		return
+	}
+
 	writeJSON(w, http.StatusOK, map[string]any{
 		"results":   results,
 		"standings": standings,

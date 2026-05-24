@@ -1,6 +1,8 @@
 package prediction
 
 import (
+	"fmt"
+
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/domain"
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/repository"
 	"github.com/YavuzCanAtalay/InsiderOne_FullStackTestCase/internal/service"
@@ -13,7 +15,7 @@ type PredictionEngine interface {
 	Predict(currentWeek int) ([]domain.Prediction, error)
 }
 
-type MonteCarloPredictionEngine struct {
+type MonteCarloPredictionEngine struct { // asks repositories for data
 	teamRepo  repository.TeamRepository
 	matchRepo repository.MatchRepository
 	simulator simulator.MatchSimulator
@@ -32,22 +34,22 @@ func NewPredictionEngine(
 }
 
 func (e *MonteCarloPredictionEngine) Predict(currentWeek int) ([]domain.Prediction, error) {
-	teams, err := e.teamRepo.GetAll()
+	teams, err := e.teamRepo.GetAll() // loads all teams
 	if err != nil {
 		return nil, err
 	}
 
-	unplayed, err := e.matchRepo.GetUnplayed()
+	unplayed, err := e.matchRepo.GetUnplayed() //loads unplayed matches
 	if err != nil {
 		return nil, err
 	}
 
-	playedMatches, err := e.matchRepo.GetAll()
+	playedMatches, err := e.matchRepo.GetAll() // loads all matches
 	if err != nil {
 		return nil, err
 	}
 
-	teamMap := make(map[int]domain.Team)
+	teamMap := make(map[int]domain.Team) // builds a map of teams; key is team ID and value is team struct, used for quick lookups during simulation
 	for _, t := range teams {
 		teamMap[t.ID] = t
 	}
@@ -56,10 +58,11 @@ func (e *MonteCarloPredictionEngine) Predict(currentWeek int) ([]domain.Predicti
 	championCount := make(map[int]int)
 	positionSum := make(map[int]float64)
 
-	for i := 0; i < simulations; i++ {
+	for i := 0; i < simulations; i++ { // onte carlo simulation 
+		// simulate season
 		simMatches := simulateSeason(playedMatches, unplayed, teamMap, e.simulator)
 		standings := service.CalculateStandings(teams, simMatches)
-
+		// update stats
 		for pos, s := range standings {
 			positionSum[s.TeamID] += float64(pos + 1)
 			if pos == 0 {
@@ -67,13 +70,13 @@ func (e *MonteCarloPredictionEngine) Predict(currentWeek int) ([]domain.Predicti
 			}
 		}
 	}
-
+	//predict championship probabilities and expected final positions based on simulation results
 	predictions := make([]domain.Prediction, 0, len(teams))
 	for _, t := range teams {
 		predictions = append(predictions, domain.Prediction{
 			TeamID:                  t.ID,
 			TeamName:                t.Name,
-			ChampionshipProbability: float64(championCount[t.ID]) / float64(simulations) * 100,
+			ChampionshipProbability: fmt.Sprintf("%.3f%%", float64(championCount[t.ID])/float64(simulations)*100),
 			ExpectedFinalPosition:   positionSum[t.ID] / float64(simulations),
 		})
 	}

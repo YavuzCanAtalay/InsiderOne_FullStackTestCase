@@ -15,15 +15,18 @@ RUN go mod download && go mod verify
 
 # Copy source and build
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /football-api ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -buildvcs=false -o /football-api ./cmd/api
 
 # Final stage — minimal image
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates tzdata
+RUN apk --no-cache add ca-certificates tzdata postgresql-client
 
 WORKDIR /root/
 COPY --from=builder /football-api .
+COPY migrations/ ./migrations/
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
 EXPOSE 8080
-CMD ["./football-api"]
+CMD ["./entrypoint.sh"]
