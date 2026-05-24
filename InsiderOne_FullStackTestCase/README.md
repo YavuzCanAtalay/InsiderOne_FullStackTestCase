@@ -1,5 +1,7 @@
 # InsiderOne_FullStackTestCase
 
+For terminal inputs scroll at the end of the readme file
+
 Go backend API for a 4-team football league simulation. The application stores teams and matches in PostgreSQL, simulates weekly results, calculates live standings, and estimates championship probabilities with Monte Carlo simulation.
 
 ## Features
