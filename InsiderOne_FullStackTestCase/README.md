@@ -174,9 +174,24 @@ GET /predictions/current
 
 Returns championship probability (formatted as a percentage, e.g. `"73.450%"`) and expected final position for each team. Available only after week 4 has been played. Predictions are also included automatically in the `POST /weeks/next` response from week 4 onward.
 
+## Live Deployment
+
+The project is deployed and publicly accessible on Railway:
+
+**Base URL:** `https://insideronefullstacktestcase-production.up.railway.app`
+
+```bash
+curl https://insideronefullstacktestcase-production.up.railway.app/health
+curl https://insideronefullstacktestcase-production.up.railway.app/teams
+curl https://insideronefullstacktestcase-production.up.railway.app/matches
+curl https://insideronefullstacktestcase-production.up.railway.app/standings
+curl -X POST https://insideronefullstacktestcase-production.up.railway.app/weeks/next
+curl https://insideronefullstacktestcase-production.up.railway.app/predictions/current
+```
+
 ## Example Verification Flow
 
-After starting the project, these requests are a good basic check:
+After starting the project locally, these requests are a good basic check:
 
 ```bash
 curl http://localhost:8080/teams
